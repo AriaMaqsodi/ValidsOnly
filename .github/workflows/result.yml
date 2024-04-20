@@ -1,0 +1,38 @@
+name: Update Result
+
+on:
+    workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Install httpx
+        run: pip install httpx
+
+      - name: Download and unzip file
+        run: |
+          wget https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip
+          unzip Xray-linux-64.zip
+
+      - name: Execute test process
+        run: python ./main.py
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.email "github-action@users.noreply.github.com"
+          git config --global user.name "GitHub Action"
+
+          git checkout data
+          git add results.txt
+          git commit -m "Update content of files"
+          git push
