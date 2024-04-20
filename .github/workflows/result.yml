@@ -17,7 +17,9 @@ jobs:
           python-version: 3.11
 
       - name: Checkout data
-        run: git checkout data
+        run: |
+          git pull
+          git checkout data
 
       - name: Install httpx
         run: pip install httpx
