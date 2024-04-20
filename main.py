@@ -59,7 +59,12 @@ xray_config_template = """{
 
 def run_subprocess(config: str):
     global process
-    process = subprocess.Popen(["./xray"], stdin=subprocess.PIPE)
+    process = subprocess.Popen(
+        ["./xray"],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
     process.communicate(config.encode())
 
 
@@ -89,6 +94,7 @@ with open("results.txt", "w", encoding="utf-8") as f:
                 print(f"Working: {item.decode()}")
 
         except Exception as e:
+            print("Error:")
             print(e)
             continue
 
