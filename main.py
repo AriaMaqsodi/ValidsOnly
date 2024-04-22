@@ -90,8 +90,9 @@ for item in plist.splitlines():
             "https://open.spotify.com/", proxy="http://127.0.0.1:10509"
         )
         if data.status_code == 200:
-            results[decoded_url.name] = {"link": decoded_url.link, "response_time": data.elapsed.total_seconds()}
-            print(f"Working: {item}")
+            total_sec = data.elapsed.total_seconds()
+            results[decoded_url.name] = {"link": decoded_url.link, "response_time": total_sec}
+            print(f"Get request completed in {total_sec} with:\n{item}")
 
     except Exception as e:
         print("Error:")
