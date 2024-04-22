@@ -40,4 +40,4 @@ jobs:
           git checkout data
           git add results.txt
           git commit -m "Update content of files"
-          git push
+          git push --force
