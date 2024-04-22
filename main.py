@@ -75,7 +75,7 @@ plist = base64.b64decode(plist)
 
 results = dict()
 for item in plist.splitlines():
-    decoded_url = XrayUrlDecoder(item)
+    decoded_url = XrayUrlDecoder(item.decode())
     expose_local = xray_config_template % (decoded_url.generate_json_str())
 
     thread = threading.Thread(target=run_subprocess, args=(expose_local,))
@@ -92,7 +92,7 @@ for item in plist.splitlines():
         if data.status_code == 200:
             total_sec = data.elapsed.total_seconds()
             results[decoded_url.name] = {"link": decoded_url.link, "response_time": total_sec}
-            print(f"Get request completed in {total_sec} with:\n{item}")
+            print(f"Get request completed in {total_sec} with:\n{item.decode()}")
 
     except Exception as e:
         print("Error:")
