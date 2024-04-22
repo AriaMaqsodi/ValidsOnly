@@ -39,4 +39,4 @@ jobs:
 
           git add results.txt
           git commit -m "Update content of files"
-          git push origin --force
+          git push origin data --force
