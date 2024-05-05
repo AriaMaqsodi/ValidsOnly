@@ -76,9 +76,11 @@ plist = base64.b64decode(plist)
 results = dict()
 for item in plist.splitlines():
     decoded_url = XrayUrlDecoder(item.decode())
-    sni = decoded_url.stream_setting_obj().tlsSettings.serverName.lower()
-    if sni.endswith(".workers.dev") or sni.endswith(".pages.dev"):
-        continue
+    stream_settings = decoded_url.stream_setting_obj()
+    if hasattr(stream_settings, 'tlsSettings'):
+        sni = stream_settings.tlsSettings.serverName.lower()
+        if sni.endswith(".workers.dev") or sni.endswith(".pages.dev"):
+            continue
     expose_local = xray_config_template % (decoded_url.generate_json_str())
 
     thread = threading.Thread(target=run_subprocess, args=(expose_local,))
