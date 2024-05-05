@@ -75,7 +75,7 @@ plist = base64.b64decode(plist)
 
 results = dict()
 for item in plist.splitlines():
-    decoded_url = XrayUrlDecoder(item)
+    decoded_url = XrayUrlDecoder(item.decode())
     sni = decoded_url.stream_setting_obj().tlsSettings.serverName.lower()
     if sni.endswith(".workers.dev") or sni.endswith(".pages.dev"):
         continue
