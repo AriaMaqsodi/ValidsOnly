@@ -77,7 +77,7 @@ results = dict()
 for item in plist.splitlines():
     decoded_url = XrayUrlDecoder(item.decode())
     stream_settings = decoded_url.stream_setting_obj()
-    if hasattr(stream_settings, 'tlsSettings'):
+    if hasattr(stream_settings.tlsSettings, 'serverName'):
         sni = stream_settings.tlsSettings.serverName.lower()
         if sni.endswith(".workers.dev") or sni.endswith(".pages.dev"):
             continue
