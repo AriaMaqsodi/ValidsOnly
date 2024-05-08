@@ -117,6 +117,19 @@ class TCPSettings:
             self.header = header
 
 
+class HttpUpgradeSettings:
+    acceptProxyProtocol: bool
+    path: str
+    host: str
+    headers: dict
+
+    def __init__(self, accept_proxy_protocol: bool = None, path: str = None, host: str = None, headers: dict = None) -> None:
+        self.acceptProxyProtocol = accept_proxy_protocol if accept_proxy_protocol is not None else False
+        self.path = path
+        self.host = host
+        self.headers = headers if headers is not None else {}
+
+
 class StreamSettings:
     network: str
     security: str
@@ -125,9 +138,10 @@ class StreamSettings:
     wsSettings: WsSettingsVless
     grpcSettings: GrpcSettings
     tcpSettings: TCPSettings
+    httpupgradeSettings: HttpUpgradeSettings
 
     def __init__(self, network: str, security: str, ws_settings: WsSettingsVless = None,
-                 grpc_settings: GrpcSettings = None, tcp_settings: TCPSettings = None, tls_settings: TLSSettings = None,
+                 grpc_settings: GrpcSettings = None, tcp_settings: TCPSettings = None, httpupgrade_settings: HttpUpgradeSettings = None, tls_settings: TLSSettings = None,
                  reality_settings: RealitySettings = None) -> None:
         self.network = network
         self.security = security
@@ -141,3 +155,5 @@ class StreamSettings:
             self.grpcSettings = grpc_settings
         if tcp_settings is not None:
             self.tcpSettings = tcp_settings
+        if httpupgrade_settings is not None:
+            self.httpupgradeSettings = httpupgrade_settings
