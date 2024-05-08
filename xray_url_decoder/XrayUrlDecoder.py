@@ -13,6 +13,7 @@ from xray_url_decoder.IsValid import (
 from xray_url_decoder.XraySetting import (
     GrpcSettings,
     TCPSettings,
+    HttpUpgradeSettings,
     WsSettingsVless,
     RealitySettings,
     TLSSettings,
@@ -125,6 +126,7 @@ class XrayUrlDecoder:
         wsSetting = None
         grpcSettings = None
         tcpSettings = None
+        httpupgradeSettings = None
         tlsSettings = None
         realitySettings = None
 
@@ -167,6 +169,9 @@ class XrayUrlDecoder:
 
                 tcpSettings = TCPSettings(None, header)
 
+            case "httpupgrade":
+                httpupgradeSettings = HttpUpgradeSettings(None, self.getQuery("path"), self.getQuery("host"))
+
             case _:
                 self.isSupported = False
                 print("type '{}' is not supported yet".format(self.type))
@@ -203,6 +208,7 @@ class XrayUrlDecoder:
             wsSetting,
             grpcSettings,
             tcpSettings,
+            httpupgradeSettings,
             tlsSettings,
             realitySettings,
         )
