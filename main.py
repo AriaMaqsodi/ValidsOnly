@@ -9,49 +9,49 @@ from xray_url_decoder.XrayUrlDecoder import XrayUrlDecoder
 
 xray_config_template = """{
   "log": {
-    "access": "",
-    "error": "",
-    "loglevel": "warning"
+	"access": "",
+	"error": "",
+	"loglevel": "warning"
   },
   "inbounds": [
-    {
-      "tag": "socks",
-      "port": 10508,
-      "listen": "127.0.0.1",
-      "protocol": "socks",
-      "sniffing": {
-        "enabled": true,
-        "destOverride": [
-          "http",
-          "tls"
-        ],
-        "routeOnly": false
-      },
-      "settings": {
-        "auth": "noauth",
-        "udp": true,
-        "allowTransparent": false
-      }
-    },
-    {
-      "tag": "http",
-      "port": 10509,
-      "listen": "127.0.0.1",
-      "protocol": "http",
-      "sniffing": {
-        "enabled": true,
-        "destOverride": [
-          "http",
-          "tls"
-        ],
-        "routeOnly": false
-      },
-      "settings": {
-        "auth": "noauth",
-        "udp": true,
-        "allowTransparent": false
-      }
-    }
+	{
+	  "tag": "socks",
+	  "port": 10508,
+	  "listen": "127.0.0.1",
+	  "protocol": "socks",
+	  "sniffing": {
+		"enabled": true,
+		"destOverride": [
+		  "http",
+		  "tls"
+		],
+		"routeOnly": false
+	  },
+	  "settings": {
+		"auth": "noauth",
+		"udp": true,
+		"allowTransparent": false
+	  }
+	},
+	{
+	  "tag": "http",
+	  "port": 10509,
+	  "listen": "127.0.0.1",
+	  "protocol": "http",
+	  "sniffing": {
+		"enabled": true,
+		"destOverride": [
+		  "http",
+		  "tls"
+		],
+		"routeOnly": false
+	  },
+	  "settings": {
+		"auth": "noauth",
+		"udp": true,
+		"allowTransparent": false
+	  }
+	}
   ],
   "outbounds": [%s]
 }"""
@@ -75,28 +75,37 @@ plist = base64.b64decode(plist)
 
 results = dict()
 for item in plist.splitlines():
-    decoded_url = XrayUrlDecoder(item.decode())
-    stream_settings = decoded_url.stream_setting_obj()
-    if hasattr(stream_settings, 'tlsSettings') and hasattr(stream_settings.tlsSettings, 'serverName'):
-        sni = stream_settings.tlsSettings.serverName.lower().rstrip('.')
-        if sni.endswith(".workers.dev") or sni.endswith(".pages.dev"):
+    try:
+        decoded_url = XrayUrlDecoder(item.decode())
+        stream_settings = decoded_url.stream_setting_obj()
+        if hasattr(stream_settings, "tlsSettings") and hasattr(
+            stream_settings.tlsSettings, "serverName"
+        ):
+            sni = stream_settings.tlsSettings.serverName.lower().rstrip(".")
+            if sni.endswith(".workers.dev") or sni.endswith(".pages.dev"):
+                continue
+        expose_local = xray_config_template % (decoded_url.generate_json_str())
+
+        thread = threading.Thread(target=run_subprocess, args=(expose_local,))
+        thread.start()
+
+        if not thread.is_alive():
+            print("Thread is not alive!")
             continue
-    expose_local = xray_config_template % (decoded_url.generate_json_str())
-
-    thread = threading.Thread(target=run_subprocess, args=(expose_local,))
-    thread.start()
-
-    if not thread.is_alive():
-        print("Thread is not alive!")
-        continue
+    except Exception as e:
+        print(f"err: {e}")
 
     try:
         data = httpx.get(
-            "https://aistudio.google.com/prompts/new_chat", proxy="http://127.0.0.1:10509"
+            "https://aistudio.google.com/prompts/new_chat",
+            proxy="http://127.0.0.1:10509",
         )
         if data.status_code == 200:
             total_sec = data.elapsed.total_seconds()
-            results[decoded_url.name] = {"link": decoded_url.link, "response_time": total_sec}
+            results[decoded_url.name] = {
+                "link": decoded_url.link,
+                "response_time": total_sec,
+            }
             print(f"Get request completed in {total_sec} with:\n{item.decode()}")
 
     except Exception as e:
