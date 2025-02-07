@@ -97,10 +97,10 @@ for item in plist.splitlines():
 
     try:
         data = httpx.get(
-            "https://open.spotify.com/",
+            "https://aistudio.google.com/prompts/new_chat",
             proxy="http://127.0.0.1:10509",
         )
-        if data.status_code == 200:
+        if data.status_code != 403:
             total_sec = data.elapsed.total_seconds()
             results[decoded_url.name] = {
                 "link": decoded_url.link,
